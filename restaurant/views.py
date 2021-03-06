@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_http_methods, require_GET
+from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Menu, Restaurant
@@ -30,9 +30,27 @@ def restaurant_create_list(request):
         )
         new_restaurant.save()
         obj = model_to_dict(new_restaurant)
-        return HttpResponse(json.dumps(obj, ensure_ascii=False), content_type="application/json", status=201)
+        return JsonResponse(obj, json_dumps_params={"ensure_ascii":False}, status=201)
 
 @require_GET
 def restaurant_detail(request, pk):
-    data = Restaurant.objects.values("id", "name", "description", "address", "phone_number").get(pk=pk)
-    return JsonResponse(data, json_dumps_params={"ensure_ascii":False})
+    restaurant = Restaurant.objects.prefetch_related("menus").get(pk=pk)
+    menus = []
+    for menu in restaurant.menus.all():
+        menus.append({"id":menu.id, "name":menu.name, "price":menu.price})
+    res = {"id":restaurant.id, "name":restaurant.name, "description":restaurant.description, "address":restaurant.address, "phone_number":restaurant.phone_number, "menus":menus}
+    return JsonResponse(res, json_dumps_params={"ensure_ascii":False})
+
+@csrf_exempt
+@require_POST
+def menu_create(request, pk):
+    data = json.loads(request.body)
+    restaurant = Restaurant.objects.get(pk=pk)
+    new_menu = Menu(
+        restaurant=restaurant,
+        name=data.get("name"),
+        price=data.get("price")
+    )
+    new_menu.save()
+    obj = model_to_dict(new_menu, fields=["id", "name", "price"])
+    return JsonResponse(obj, json_dumps_params={"ensure_ascii":False}, status=201)
