@@ -15,7 +15,7 @@ class Restaurant(models.Model):
         verbose_name_plural = _("음식점")
 
 class Menu(models.Model):
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name="menus")
     name = models.CharField(_("메뉴 이름"), max_length=255)
     price = models.IntegerField(_("메뉴 가격"))
 
