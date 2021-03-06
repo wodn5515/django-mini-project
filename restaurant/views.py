@@ -15,7 +15,7 @@ import json
 # Create your views here.
 
 ############################ Function Based View ###########################
-'''
+
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def restaurant_create_list(request):
@@ -59,7 +59,7 @@ def menu_create(request, pk):
     new_menu.save()
     obj = model_to_dict(new_menu, fields=["id", "name", "price"])
     return JsonResponse(obj, json_dumps_params={"ensure_ascii":False}, status=201)
-'''
+
 
 ################################ Class Based View ###############################
 
