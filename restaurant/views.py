@@ -20,7 +20,7 @@ import json
 @require_http_methods(["GET", "POST"])
 def restaurant_create_list(request):
     if request.method == "GET":
-        restaurant = Restaurant.objects.values("id", "name", "address", "phone_number").all()
+        restaurant = Restaurant.objects.values("id", "name", "address", "phone_number").all().order_by("id")
         paginator = Paginator(restaurant, 20)
         page = int(request.GET.get("page", 1))
         data = paginator.get_page(page)
@@ -66,7 +66,7 @@ def menu_create(request, pk):
 @method_decorator(csrf_exempt, name="dispatch")
 class RestaurantView(View):
     def get(self, request, *args, **kwargs):
-        restaurant = Restaurant.objects.values("id", "name", "address", "phone_number").all()
+        restaurant = Restaurant.objects.values("id", "name", "address", "phone_number").all().order_by("id")
         paginator = Paginator(restaurant, 20)
         page = int(request.GET.get("page", 1))
         data = paginator.get_page(page)
