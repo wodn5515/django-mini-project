@@ -9,6 +9,7 @@ from .models import Restaurant, Menu
 class RestaurantListCreateView(ListCreateAPIView):
     pagination_class = StandardPagination
 
+    # 요청된 method 에 따른 serializer class 가져오기
     def get_serializer_class(self):
         if self.request.method == "GET":
             return RestaurantListSerializer
@@ -20,7 +21,7 @@ class RestaurantListCreateView(ListCreateAPIView):
 
 class RestaurantRetrieveView(RetrieveAPIView):
     serializer_class = RestaurantDetailSerializer
-    queryset = Restaurant.objects.all()
+    queryset = Restaurant.objects.prefetch_related("menus").all()
 
 
 class MenuCreateView(CreateAPIView):

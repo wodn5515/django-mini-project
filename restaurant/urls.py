@@ -21,7 +21,10 @@ fbv_urlpatterns = [
 ]
 
 urlpatterns = [
+    # djangorestframework 를 이용해 작성한 view
     path("drf/", include(drf_urlpatterns)),
+    # ClassBasedView 를 이용해 작성한 view
     path("cbv/", include(cbv_urlpatterns)),
+    # FunctionBasedView 를 이용해 작성한 view
     path("fbv/", include(fbv_urlpatterns))
 ]
