@@ -1,9 +1,12 @@
-from django.shortcuts import render
+from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
 from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import csrf_exempt
+
 from .models import Menu, Restaurant
+
 import json
 
 
@@ -12,9 +15,10 @@ import json
 @require_http_methods(["GET", "POST"])
 def restaurant_create_list(request):
     if request.method == "GET":
+        restaurant = Restaurant.objects.values("id", "name", "address", "phone_number").all()
+        paginator = Paginator(restaurant, 20)
         page = int(request.GET.get("page", 1))
-        start = (page-1)*20
-        data = Restaurant.objects.values("id", "name", "address", "phone_number").all()[start:start+20]
+        data = paginator.get_page(page)
         return JsonResponse(list(data), safe=False, json_dumps_params={"ensure_ascii":False})
     elif request.method == "POST":
         data = json.loads(request.body)
